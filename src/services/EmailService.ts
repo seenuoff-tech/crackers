@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { safeStorage } from "./storageService";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -12,7 +13,7 @@ export interface EmailLog {
 }
 
 let emailLogs: EmailLog[] = (() => {
-  const saved = localStorage.getItem('crackers_email_logs');
+  const saved = safeStorage.getItem('crackers_email_logs');
   return saved ? JSON.parse(saved) : [];
 })();
 
@@ -57,7 +58,7 @@ export const sendOrderStatusEmail = async (customerEmail: string, orderId: strin
       status: status
     };
     emailLogs = [newLog, ...emailLogs];
-    localStorage.setItem('crackers_email_logs', JSON.stringify(emailLogs));
+    safeStorage.setItem('crackers_email_logs', JSON.stringify(emailLogs));
 
     console.log("Email Send Result:", sendResult);
     
