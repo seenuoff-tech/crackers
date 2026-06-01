@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Building2, Mail, Phone, MapPin, CheckCircle2 } from 'lucide-react';
+import { safeStorage } from '../../services/storageService';
 
 const AdminSettings: React.FC = () => {
   const [settings, setSettings] = useState({
@@ -16,19 +17,19 @@ const AdminSettings: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem('adminBusinessSettings');
+    const savedSettings = safeStorage.getItem('adminBusinessSettings');
     if (savedSettings) {
       const parsed = JSON.parse(savedSettings);
       if (parsed.phone === '+91 98765 43210') {
         parsed.phone = '+91 8428470009';
-        localStorage.setItem('adminBusinessSettings', JSON.stringify(parsed));
+        safeStorage.setItem('adminBusinessSettings', JSON.stringify(parsed));
       }
       setSettings(parsed);
     }
   }, []);
 
   const handleSave = () => {
-    localStorage.setItem('adminBusinessSettings', JSON.stringify(settings));
+    safeStorage.setItem('adminBusinessSettings', JSON.stringify(settings));
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };

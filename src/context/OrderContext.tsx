@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { safeStorage } from '../services/storageService';
 
 export interface Order {
   id: string;
@@ -21,10 +22,10 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('crackers_orders');
+    const saved = safeStorage.getItem('crackers_orders');
     if (saved) return JSON.parse(saved);
     return [
-      { id: '#ORD-7241', date: '2024-03-08', customer: 'Rahul Sharma', email: 'rahul@example.com', phone: '+91 98765 43210', status: 'Delivered', amount: '₹2,450' },
+      { id: '#ORD-7241', date: '2024-03-08', customer: 'Rahul Sharma', email: 'rahul@example.com', phone: '+91 8428470009', status: 'Delivered', amount: '₹2,450' },
       { id: '#ORD-7242', date: '2024-03-08', customer: 'Priya Patel', email: 'priya@example.com', phone: '+91 98765 43211', status: 'Processing', amount: '₹1,200' },
       { id: '#ORD-7243', date: '2024-03-07', customer: 'Amit Kumar', email: 'amit@example.com', phone: '+91 98765 43212', status: 'Pending', amount: '₹850' },
       { id: '#ORD-7244', date: '2024-03-07', customer: 'Sneha Gupta', email: 'sneha@example.com', phone: '+91 98765 43213', status: 'Delivered', amount: '₹3,100' },
@@ -34,7 +35,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   });
 
   React.useEffect(() => {
-    localStorage.setItem('crackers_orders', JSON.stringify(orders));
+    safeStorage.setItem('crackers_orders', JSON.stringify(orders));
   }, [orders]);
 
   const addOrder = (newOrderData: Omit<Order, 'id' | 'date' | 'status'>) => {

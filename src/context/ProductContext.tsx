@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from './CartContext';
+import { safeStorage } from '../services/storageService';
 
 interface ProductContextType {
   products: Product[];
@@ -81,7 +82,7 @@ const initialProducts: Product[] = [
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('adminProducts');
+    const saved = safeStorage.getItem('adminProducts');
     if (!saved) return initialProducts;
     
     // Auto-migrate old picsum.photos URLs to stunning new Unsplash images
@@ -135,7 +136,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   useEffect(() => {
-    localStorage.setItem('adminProducts', JSON.stringify(products));
+    safeStorage.setItem('adminProducts', JSON.stringify(products));
   }, [products]);
 
   const addProduct = (product: Omit<Product, 'id'>) => {

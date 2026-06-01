@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { safeStorage } from '../services/storageService';
 
 export interface Slide {
   id: number;
@@ -51,7 +52,7 @@ const defaultSlides: Slide[] = [
 
 export const SliderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [slides, setSlides] = useState<Slide[]>(() => {
-    const saved = localStorage.getItem('home_slides');
+    const saved = safeStorage.getItem('home_slides');
     if (!saved) return defaultSlides;
     
     // Auto-migrate old picsum.photos URLs to stunning new Unsplash images
@@ -68,7 +69,7 @@ export const SliderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   });
 
   useEffect(() => {
-    localStorage.setItem('home_slides', JSON.stringify(slides));
+    safeStorage.setItem('home_slides', JSON.stringify(slides));
   }, [slides]);
 
   const addSlide = (slide: Omit<Slide, 'id'>) => {

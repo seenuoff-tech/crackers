@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { safeStorage } from '../services/storageService';
 
 interface User {
   email: string;
@@ -19,8 +20,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const auth = localStorage.getItem('isAuthenticated') === 'true';
-    const savedUser = localStorage.getItem('user');
+    const auth = safeStorage.getItem('isAuthenticated') === 'true';
+    const savedUser = safeStorage.getItem('user');
     setIsAuthenticated(auth);
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -29,15 +30,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (email: string, name: string = 'Customer') => {
     const userData = { email, name };
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('user', JSON.stringify(userData));
+    safeStorage.setItem('isAuthenticated', 'true');
+    safeStorage.setItem('user', JSON.stringify(userData));
     setIsAuthenticated(true);
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
+    safeStorage.removeItem('isAuthenticated');
+    safeStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
   };
