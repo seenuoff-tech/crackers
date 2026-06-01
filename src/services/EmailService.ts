@@ -1,7 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { safeStorage } from "./storageService";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Helper to safely get the AI client, preventing top-level crashes if API key is missing
+const getAiClient = () => {
+  const apiKey = process.env.GEMINI_API_KEY || "";
+  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
+    console.warn("[EmailService] GEMINI_API_KEY is not configured or is a placeholder. AI will be bypassed.");
+    return null;
+  }
+  try {
+    return new GoogleGenAI({ apiKey });
+  } catch (error) {
+    console.error("[EmailService] Failed to initialize GoogleGenAI:", error);
+    return null;
+  }
+};
 
 export interface EmailLog {
   id: string;
@@ -23,15 +36,25 @@ export const sendOrderStatusEmail = async (customerEmail: string, orderId: strin
   console.log(`Simulating email to ${customerEmail} for order ${orderId} with status ${status}`);
   
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `Generate a professional and friendly email body for a customer whose order status has been updated to "${status}". 
-      Order ID: ${orderId}. 
-      The store name is "Crackers". 
-      Keep it concise and helpful.`,
-    });
+    const ai = getAiClient();
+    let emailBody = `Dear Customer, \n\nYour order #${orderId} status has been updated to "${status}". We are processing your request. \n\nThank you for choosing Crackers!\nFor any queries, contact us at 8428470009.`;
 
-    const emailBody = response.text;
+    if (ai) {
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: `Generate a professional and friendly email body for a customer whose order status has been updated to "${status}". 
+          Order ID: ${orderId}. 
+          The store name is "Crackers". 
+          Keep it concise and helpful.`,
+        });
+        if (response && response.text) {
+          emailBody = response.text;
+        }
+      } catch (aiError) {
+        console.error("Gemini AI generation failed, falling back to default text:", aiError);
+      }
+    }
     
     // Call backend to send real email via Resend
     const sendResponse = await fetch('/api/send-email', {
