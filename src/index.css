@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #D4AF37;
+  --color-gold-light: #F9E2AF;
+  --color-spark: #FFD700;
+  --color-festive-red: #C41E3A;
+  --color-night-sky: #0A0A0A;
+  --color-night-deep: #050505;
+}
+
+@layer base {
+  body {
+    @apply bg-night-sky text-gray-100;
+  }
+  input, textarea, select {
+    @apply text-black;
+  }
+}
+
+.glow-gold {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.glow-red {
+  box-shadow: 0 0 15px rgba(196, 30, 58, 0.4);
+}
+
+.firework-bg {
+  background-image: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(to bottom, #F9E2AF, #D4AF37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
